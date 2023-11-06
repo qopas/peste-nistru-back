@@ -25,7 +25,7 @@ public class MessageService {
         this.userRepository = userRepository;
     }
 
-    public void saveMessage(MessagePayload message) {
+    public Message saveMessage(MessagePayload message) {
         ChatRoom chatRoom = chatRoomRepository.findById(message.getRoomId()).orElse(null);
         if (chatRoom == null) {
             chatRoom = new ChatRoom();
@@ -39,6 +39,7 @@ public class MessageService {
         System.out.println(userRepository.findById(message.getSenderId()).get());
         m.setTimestamp(LocalDateTime.now());
         messageRepository.save(m);
+        return m;
     }
     public List<MessageDTO> getMessagesForRoom(Integer roomId) {
         return messageRepository.findByChatRoom_IdOrderByTimestamp(roomId)

@@ -13,4 +13,5 @@ public class MessagePayload {
     private Integer roomId;
     private Integer senderId;
     private String message;
+    private String language;
 }

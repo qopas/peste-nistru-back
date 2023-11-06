@@ -2,6 +2,7 @@ package org.example.Controllers;
 
 import org.example.Dto.MessageDTO;
 import org.example.chatRoom.Message;
+import org.example.deepL.TranslatorClass;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.simp.SimpMessageSendingOperations;
@@ -28,22 +29,15 @@ public class MessageController {
     }
 
     // Endpoint for sending a message to a chat room
-    @MessageMapping("/sendMessage/{roomID}")
-    @SendTo("/topic/{roomID}")
-    public MessageDTO sendMessage(@Payload MessagePayload message) {
-        messageService.saveMessage(message);
-        System.out.println("Received and processed message: " + message.getMessage());
-        return new MessageDTO(
-                 message.getSenderId(),
-                 null,
-                 message.getMessage(),
-                 LocalDateTime.now()
-         );
-    }
 
-    @GetMapping("api/messages/{roomId}")
-    public List<MessageDTO> getMessagesForRoom(@PathVariable Integer roomId) {
+    @GetMapping("api/messages/{roomId}/{language}")
+    public List<MessageDTO> getMessagesForRoom(@PathVariable Integer roomId, @PathVariable String language) throws Exception {
         // Retrieve messages for the specified chat room
-        return messageService.getMessagesForRoom(roomId);
+        TranslatorClass translatorClass = new TranslatorClass();
+        List<MessageDTO> messageDTOS = messageService.getMessagesForRoom(roomId);
+        for (MessageDTO m: messageDTOS){
+            m.setMessageText(translatorClass.translateText(m.getMessageText(), language).getText());
+        }
+        return messageDTOS;
     }
 }
